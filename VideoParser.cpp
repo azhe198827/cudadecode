@@ -13,9 +13,16 @@
 
 #include "VideoDecoder.h"
 #include "FrameQueue.h"
-
+#include "cuda_runtime.h"
 #include <cstring>
 #include <cassert>
+
+//#include "opencv2/opencv.hpp"
+#define DISPLAY
+
+#ifdef DISPLAY
+#include "opencv2/opencv.hpp"
+#endif
 
 VideoParser::VideoParser(VideoDecoder *pVideoDecoder, FrameQueue *pFrameQueue, CUcontext *pCudaContext): hParser_(0)
 {
@@ -79,9 +86,29 @@ VideoParser::HandlePictureDisplay(void *pUserData, CUVIDPARSERDISPINFO *pPicPara
     // std::cout << *pPicParams << std::endl;
 
     VideoParserData *pParserData = reinterpret_cast<VideoParserData *>(pUserData);
-	printf("frame = %d\n", frame_num++);
-    //pParserData->pFrameQueue->enqueue(pPicParams);
+	//printf("frame = %d\n", frame_num++);
+	char * temp_gpu = NULL;
 
+
+	CUVIDPROCPARAMS oVideoProcessingParameters;	CUdeviceptr		pSrc = 0;
+	unsigned int	nPitch = 0;
+	memset(&oVideoProcessingParameters, 0, sizeof(CUVIDPROCPARAMS));
+	oVideoProcessingParameters.progressive_frame = pPicParams->progressive_frame;
+	oVideoProcessingParameters.second_field = 0;
+	oVideoProcessingParameters.top_field_first = pPicParams->top_field_first;
+	oVideoProcessingParameters.unpaired_field = (pPicParams->progressive_frame == 1);
+	pParserData->pVideoDecoder->mapFrame(pPicParams->picture_index, &pSrc, &nPitch, &oVideoProcessingParameters);
+#ifdef DISPLAY	
+	cv::Mat imageNV12(cv::Size(1536, 720 * 3 / 2), CV_8UC1);
+	cv::Mat imageRgb(cv::Size(1536, 720), CV_8UC3);
+	cudaMemcpy(imageNV12.data, (uchar*)pSrc, 1536 * 720 * 3 / 2, cudaMemcpyDeviceToHost);
+	cv::cvtColor(imageNV12, imageRgb, cv::COLOR_YUV2RGB_NV21);
+	cv::imshow("1", imageRgb);
+	cv::waitKey(5);
+#endif
+	pParserData->pVideoDecoder->unmapFrame(pSrc);
+    //pParserData->pFrameQueue->enqueue(pPicParams);
+	cudaFree(temp_gpu);
     return 1;
 }
 

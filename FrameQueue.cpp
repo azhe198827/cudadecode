@@ -150,7 +150,7 @@ bool
 FrameQueue::isDecodeFinished()
 const
 {
-    return (nFramesInQueue_ == 0 && 0 != bEndOfDecode_);
+	return (nFramesInQueue_ == 0 && 0 != bEndOfDecode_);
 }
 
 void

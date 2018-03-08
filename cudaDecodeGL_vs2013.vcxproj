@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IntDir>$(Platform)/$(Configuration)/</IntDir>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include;D:\SDK\opencv3.0\build\include;$(IncludePath)</IncludePath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -111,20 +111,12 @@
     <ClCompile Include="VideoDecoder.cpp" />
     <ClCompile Include="VideoParser.cpp" />
     <ClCompile Include="VideoSource.cpp" />
-    <ClCompile Include="cudaModuleMgr.cpp" />
-    <ClCompile Include="cudaProcessFrame.cpp" />
-    <ClCompile Include="videoDecodeGL.cpp" />
-    <CudaCompile Include="NV12ToARGB_drvapi.cu">
-      <CompileOut Condition="'$(Platform)'=='x64'">data/%(Filename)64.ptx</CompileOut>
-      <NvccCompilation>ptx</NvccCompilation>
-    </CudaCompile>
+    <ClCompile Include="cudaDecode.cpp" />
+    <ClInclude Include="cudaDecode.h" />
     <ClInclude Include="FrameQueue.h" />
     <ClInclude Include="VideoDecoder.h" />
     <ClInclude Include="VideoParser.h" />
     <ClInclude Include="VideoSource.h" />
-    <ClInclude Include="cudaModuleMgr.h" />
-    <ClInclude Include="cudaProcessFrame.h" />
-    <None Include="data\plush1_720p_10s.m2v" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
